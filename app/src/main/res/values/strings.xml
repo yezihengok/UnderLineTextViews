@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">My Application4</string>
+    <string name="hello">how are just an good yellow people 这是基于baseLine的原生下划线 距离文字近 。</string>
+    <string name="hello1"> a Little Bird and the Bath,Honey food Baby Bear 英文在前中文在后，以开头英文1个单词作为偏移量的行末是中文的 偏移量需要增加</string>
+    <string name="hello2">中文在前英文在后，英文单词显示不下会提前换行a Little Bird and the Bath,Hone food Baby good</string>
+    <string name="hello3">Java中判断字符串的编码有两种思路：一种是根据byte的长度判断，dLl的字母数字好标点符号都是一个byte，且值在0-255之间另一种是根据中文的Unicode取值范围判断，这个就是把所以的范围都包含，才能判断正确，参考unicode中文范围range</string>
+</resources>
+

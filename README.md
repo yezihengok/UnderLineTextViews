@@ -3,9 +3,9 @@
 
 > 众所周知 android自带的下划线，如 SpannableString 是基于BaseLine去画的无法单独更改颜色、与文字的间距。 遇到如：good 的g 下划线甚至与字符重合 参见下图:
 
-> 基于此便自定义实现需求： 自定义 可设置与文本间距、颜色 、指定开始结束索引的方式添加下划线的textView
+ 基于此便自定义实现需求： 自定义 可设置与文本间距、颜色 、指定开始结束索引的方式添加下划线的textView
 
-该项目基于原作者 [(UnderLineTextView)](https://github.com/lixiaote/UnderLineTextView) 功能修复 优化而来  
+> 该项目基于原作者 [(UnderLineTextView)](https://github.com/lixiaote/UnderLineTextView) 功能修复 优化而来  
 
  ### UnderLineTextViews 
  * 新增 下划线可添加与文字间距 （注意下划线与文字间隔值设置的过于大时，请适当设置调大setLineSpacing 行间距）

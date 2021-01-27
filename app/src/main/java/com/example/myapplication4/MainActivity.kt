@@ -32,8 +32,8 @@ class MainActivity : AppCompatActivity() {
         //添加多段
         text3.text = getString(R.string.hello3)
         val list: MutableList<Array<Int>> =mutableListOf()
-        list.add(arrayOf(7, 9))
-        list.add(arrayOf(11, 18))
+        list.add(arrayOf(7, 10))
+        list.add(arrayOf(13, 18))
         list.add(arrayOf(22, 28))
         list.add(arrayOf(33, 38))
         list.add(arrayOf(45, 55))

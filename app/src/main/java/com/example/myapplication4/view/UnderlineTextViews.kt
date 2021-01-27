@@ -97,7 +97,7 @@ import java.util.*
  * 可跨行 指定索引的下划线
  * Created by yzh on 2021/1/11 17:12.
  */
-class UnderlineTextViews @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : AppCompatTextView(context, attrs, defStyleAttr) {
+open class UnderlineTextViews @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) : AppCompatTextView(context, attrs, defStyleAttr) {
     private val TAG = "UnderlineTextViews"
     lateinit var mRect: Rect
     lateinit var mPaint: Paint
@@ -105,8 +105,9 @@ class UnderlineTextViews @JvmOverloads constructor(context: Context, attrs: Attr
     private var density = 0f
     private var mStrokeWidth = 0f
     private var mLineTopMargin = 0f
+
     private var mList: MutableList<Array<Int>>? = null
-    private var content:String=""
+    var content:String=""
 
     init {
         init(context, attrs, defStyleAttr)
@@ -163,7 +164,7 @@ class UnderlineTextViews @JvmOverloads constructor(context: Context, attrs: Attr
     @RequiresApi(api = Build.VERSION_CODES.M)
     override fun onDraw(canvas: Canvas) {
         content= text.toString()
-        if (mList.isNullOrEmpty() || content.isEmpty()) {
+        if (mList.isNullOrEmpty() || content.isNullOrEmpty()) {
             super.onDraw(canvas)
             return
         }
@@ -175,8 +176,6 @@ class UnderlineTextViews @JvmOverloads constructor(context: Context, attrs: Attr
         val count = lineCount
         //得到TextView的布局
         val layout = layout
-
-        Log.e(TAG, "layout--------$layout")
         //    TextView layout属性：
 //
 //    TextView 的 layout里面包含各种获取字符位置、行数、列数等的方法
@@ -191,7 +190,7 @@ class UnderlineTextViews @JvmOverloads constructor(context: Context, attrs: Attr
                 continue
             }
             val start = indexes[0]
-            val end = indexes[1]
+            var end = indexes[1]
             if (start < 0 || end == 0) {
                 Log.e(TAG, "起止索引有误!")
                 continue
@@ -200,17 +199,35 @@ class UnderlineTextViews @JvmOverloads constructor(context: Context, attrs: Attr
             val lineEnd = layout.getLineForOffset(end)
             //只存在单行
             if (lineStart == lineEnd) {
+                val lastCharInLine = layout.getLineEnd(0)-1
                 //getLineBounds得到这一行的外包矩形,这个字符的顶部Y坐标就是rect的top 底部Y坐标就是rect的bottom
                 val baseline = layout.getLineBounds(lineStart, mRect)
                 // int yStart=mRect.bottom;//字符底部y坐标
                 val xStart = layout.getPrimaryHorizontal(start) //开始字符左边x坐标
-                
+
+                var isLineEnd=false
+                if(end>=content.length){
+                    end=content.length-1
+                    isLineEnd=true
+                }
+
+                Log.e(TAG,"$start<======$lastCharInLine======>$end")
                 val msg: String = content[start].toString()
                 val msg2: String = content[end].toString()
-                Log.i(TAG, "$start============>$end")
-                Log.w(TAG, "$msg============>$msg2")
+                Log.i(TAG,"$start============>$end")
+                Log.w(TAG,"$msg============>$msg2")
 
-                val xEnd = layout.getPrimaryHorizontal(end)  //结束字符左边x坐标
+
+                //,因为无法或者行末尾字符的右边x坐标 layout.getSecondaryHorizontal 与 getPrimaryHorizontal 值是一样的。
+                //所以截止末尾的前一个字符作为,作为最后字符的x偏移量加上.
+                var xOffset=0f
+                //只有单行截止位置是行末才需要添加一个偏移量
+                if(isLineEnd){
+                    xOffset = layout.getPrimaryHorizontal(end)-layout.getPrimaryHorizontal(end - 1)
+                    xOffset = getxOffset(0,  end, xOffset)
+                }
+                val xEnd = layout.getPrimaryHorizontal(end)+xOffset  //结束字符左边x坐标
+
                 val offsetY = baseline + mLineTopMargin + mStrokeWidth
                 canvas.drawLine(xStart, offsetY, xEnd, offsetY, mPaint)
 
@@ -227,17 +244,17 @@ class UnderlineTextViews @JvmOverloads constructor(context: Context, attrs: Attr
 //                        endIndex++
 //                    }
                     if(endIndex>=content.length){
-                        endIndex--
+                        endIndex=content.length-1
                     }
-                    Log.i(TAG, "$startIndex---------->$endIndex")
+                    Log.i(TAG,"$startIndex---------->$endIndex")
                     //开始字符左边x坐标
                     val xStart = layout.getPrimaryHorizontal(startIndex) //第一行从指定start 后面行从每行开头开始
 
 
                     val msg: String = content[startIndex].toString()
                     val msg2: String = content[endIndex].toString()
-                    Log.i(TAG, "$start---------->$end")
-                    Log.w(TAG, "$msg---------->$msg2")
+                    Log.i(TAG,"$start---------->$end")
+                    Log.w(TAG,"$msg---------->$msg2")
 
 
                     //tips ：xOffset 是按开始索引位置的 1个字符所占的x 来计算的。 因为可能出现中英文混合情况。而1个汉字的x坐标占位宽度 大概是1个英文字母的 1.8倍
@@ -250,11 +267,11 @@ class UnderlineTextViews @JvmOverloads constructor(context: Context, attrs: Attr
                     //所以截止末尾的前一个字符作为,作为最后字符的x偏移量加上.
                     var xOffset = layout.getPrimaryHorizontal(endIndex)-layout.getPrimaryHorizontal(endIndex - 1)
 
-                    xOffset = getxOffset(i, endIndex, xOffset)
+                    xOffset = getxOffset(i,  endIndex, xOffset)
                     val xEnd = layout.getPrimaryHorizontal(endIndex) + xOffset //最后行从指定截止，其余每行末尾截止
 
                     //直接取文字的最右边
-                  //  val xEnd= mRect.right.toFloat()
+                    //  val xEnd= mRect.right.toFloat()
                     val offsetY = baseline + mLineTopMargin + mStrokeWidth
                     canvas.drawLine(xStart, offsetY, xEnd, offsetY, mPaint)
                 }
@@ -322,4 +339,11 @@ class UnderlineTextViews @JvmOverloads constructor(context: Context, attrs: Attr
             invalidate()
         }
 
+
+    var underlineTopMargin: Float
+        get() = mLineTopMargin
+        set(mLineTopMargin) {
+            this.mLineTopMargin = mLineTopMargin
+            invalidate()
+        }
 }
